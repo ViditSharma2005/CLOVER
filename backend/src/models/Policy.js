@@ -20,7 +20,24 @@ const policySchema = new mongoose.Schema({
 
   // Coverage Triggers
   coverageTriggers: [{
-    type: { type: String, enum: ['weather', 'pollution', 'flood', 'curfew', 'strike', 'platform_outage', 'extreme_heat'] },
+    type: {
+      type: String,
+      enum: [
+        'weather',
+        'pollution',
+        'flood',
+        'curfew',
+        'strike',
+        'platform_outage',
+        'extreme_heat',
+        'heavy_rain',
+        'severe_pollution',
+        'cyclone',
+        'hailstorm',
+        'dense_fog',
+        'cold_wave'
+      ]
+    },
     threshold: mongoose.Schema.Types.Mixed,
     description: String,
     maxPayoutPercent: Number

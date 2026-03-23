@@ -39,7 +39,7 @@ const weatherEventSchema = new mongoose.Schema({
   claimsTriggered: { type: Number, default: 0 },
 
   // Source
-  source: { type: String, enum: ['openweathermap', 'imd', 'mock', 'manual'], default: 'openweathermap' },
+  source: { type: String, enum: ['openweathermap', 'open-meteo', 'imd', 'mock', 'manual'], default: 'open-meteo' },
   rawApiResponse: mongoose.Schema.Types.Mixed
 }, {
   timestamps: true

@@ -2,6 +2,10 @@ const axios = require('axios');
 const WeatherEvent = require('../models/WeatherEvent');
 const logger = require('../utils/logger');
 
+const OPEN_METEO_GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
+const OPEN_METEO_WEATHER_URL = 'https://api.open-meteo.com/v1/forecast';
+const OPEN_METEO_AIR_QUALITY_URL = 'https://air-quality-api.open-meteo.com/v1/air-quality';
+
 // Disruption thresholds
 const THRESHOLDS = {
   extreme_heat: { temp: 42 },      // >42°C
@@ -33,28 +37,102 @@ const getCityMock = (city) => {
   return { ...MOCK_WEATHER_BY_CITY.default };
 };
 
-const fetchWeatherData = async (city, lat, lon) => {
-  if (!process.env.OPENWEATHER_API_KEY || process.env.OPENWEATHER_API_KEY === 'your_openweather_api_key_here') {
-    logger.info(`Using mock weather data for ${city}`);
-    const mock = getCityMock(city);
-    return { ...mock, source: 'mock' };
-  }
+const safeNumber = (value, fallback = 0) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : fallback;
+};
 
+const deriveAqiFromPm25 = (pm25) => {
+  // Approximate US AQI conversion for PM2.5 as a fallback when AQI is unavailable.
+  const p = safeNumber(pm25, 0);
+  if (p <= 12) return Math.round((50 / 12) * p);
+  if (p <= 35.4) return Math.round(((100 - 51) / (35.4 - 12.1)) * (p - 12.1) + 51);
+  if (p <= 55.4) return Math.round(((150 - 101) / (55.4 - 35.5)) * (p - 35.5) + 101);
+  if (p <= 150.4) return Math.round(((200 - 151) / (150.4 - 55.5)) * (p - 55.5) + 151);
+  if (p <= 250.4) return Math.round(((300 - 201) / (250.4 - 150.5)) * (p - 150.5) + 201);
+  if (p <= 350.4) return Math.round(((400 - 301) / (350.4 - 250.5)) * (p - 250.5) + 301);
+  return Math.round(((500 - 401) / (500.4 - 350.5)) * (Math.min(p, 500.4) - 350.5) + 401);
+};
+
+const geocodeCity = async (city) => {
   try {
-    const url = `${process.env.OPENWEATHER_BASE_URL || 'https://api.openweathermap.org/data/2.5'}/weather`;
-    const params = { appid: process.env.OPENWEATHER_API_KEY, units: 'metric', ...(lat && lon ? { lat, lon } : { q: city }) };
-    const res = await axios.get(url, { params, timeout: 5000 });
-    const d = res.data;
+    const res = await axios.get(OPEN_METEO_GEOCODING_URL, {
+      params: {
+        name: city,
+        country: 'IN',
+        count: 1,
+        language: 'en',
+        format: 'json'
+      },
+      timeout: 6000
+    });
+
+    const first = res.data?.results?.[0];
+    if (!first) return null;
+
     return {
-      temp: d.main.temp,
-      feelsLike: d.main.feels_like,
-      humidity: d.main.humidity,
-      rainfall: d.rain ? (d.rain['1h'] || 0) * 10 : 0,
-      windSpeed: d.wind.speed * 3.6,
-      visibility: d.visibility,
-      description: d.weather[0].description,
-      weatherCode: d.weather[0].id,
-      source: 'openweathermap'
+      lat: first.latitude,
+      lon: first.longitude,
+      resolvedCity: first.name
+    };
+  } catch (err) {
+    logger.warn(`Geocoding failed for ${city}: ${err.message}`);
+    return null;
+  }
+};
+
+const fetchWeatherData = async (city, lat, lon) => {
+  try {
+    let resolvedLat = lat;
+    let resolvedLon = lon;
+    let resolvedCity = city;
+
+    if (!resolvedLat || !resolvedLon) {
+      const geo = await geocodeCity(city);
+      if (geo) {
+        resolvedLat = geo.lat;
+        resolvedLon = geo.lon;
+        resolvedCity = geo.resolvedCity || city;
+      }
+    }
+
+    if (!resolvedLat || !resolvedLon) {
+      throw new Error('Unable to resolve city coordinates');
+    }
+
+    const res = await axios.get(OPEN_METEO_WEATHER_URL, {
+      params: {
+        latitude: resolvedLat,
+        longitude: resolvedLon,
+        current: [
+          'temperature_2m',
+          'apparent_temperature',
+          'relative_humidity_2m',
+          'precipitation',
+          'wind_speed_10m',
+          'visibility',
+          'weather_code'
+        ].join(','),
+        timezone: 'auto'
+      },
+      timeout: 7000
+    });
+
+    const c = res.data?.current || {};
+
+    return {
+      temp: safeNumber(c.temperature_2m),
+      feelsLike: safeNumber(c.apparent_temperature),
+      humidity: safeNumber(c.relative_humidity_2m),
+      rainfall: safeNumber(c.precipitation),
+      windSpeed: safeNumber(c.wind_speed_10m),
+      visibility: safeNumber(c.visibility, 5000),
+      description: `code_${safeNumber(c.weather_code)}`,
+      weatherCode: safeNumber(c.weather_code),
+      lat: resolvedLat,
+      lon: resolvedLon,
+      city: resolvedCity,
+      source: 'open-meteo'
     };
   } catch (err) {
     logger.warn(`Weather API failed for ${city}: ${err.message}. Using mock.`);
@@ -63,18 +141,37 @@ const fetchWeatherData = async (city, lat, lon) => {
 };
 
 const fetchAQIData = async (city, lat, lon) => {
-  if (!process.env.OPENWEATHER_API_KEY || process.env.OPENWEATHER_API_KEY === 'your_openweather_api_key_here') {
-    return getCityMock(city).aqi;
-  }
   try {
-    const coords = lat && lon ? { lat, lon } : { lat: 28.6, lon: 77.2 }; // Default Delhi
-    const res = await axios.get(`${process.env.AQI_API_URL}`, {
-      params: { ...coords, appid: process.env.OPENWEATHER_API_KEY }
+    let resolvedLat = lat;
+    let resolvedLon = lon;
+
+    if (!resolvedLat || !resolvedLon) {
+      const geo = await geocodeCity(city);
+      resolvedLat = geo?.lat;
+      resolvedLon = geo?.lon;
+    }
+
+    if (!resolvedLat || !resolvedLon) {
+      throw new Error('Unable to resolve city coordinates for AQI');
+    }
+
+    const res = await axios.get(OPEN_METEO_AIR_QUALITY_URL, {
+      params: {
+        latitude: resolvedLat,
+        longitude: resolvedLon,
+        current: 'us_aqi,pm2_5',
+        timezone: 'auto'
+      },
+      timeout: 7000
     });
-    // Convert AQI index (1-5) to AQI value
-    const aqiMap = { 1: 50, 2: 100, 3: 150, 4: 250, 5: 400 };
-    return aqiMap[res.data.list[0].main.aqi] || 100;
-  } catch {
+
+    const current = res.data?.current || {};
+    const aqi = safeNumber(current.us_aqi, 0);
+    if (aqi > 0) return aqi;
+
+    return deriveAqiFromPm25(current.pm2_5);
+  } catch (err) {
+    logger.warn(`AQI API failed for ${city}: ${err.message}. Using mock.`);
     return getCityMock(city).aqi;
   }
 };

@@ -105,7 +105,7 @@ export default function DashboardLayout() {
 
       {/* Worker Card */}
       {expanded && (
-        <div className="m-3 p-3 bg-white/[0.04] rounded-xl border border-white/10">
+        <div className="m-3 p-3 soft-glow-panel rounded-xl">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-brand-500/20 border border-brand-500/40 flex items-center justify-center text-brand-400 font-bold text-sm">
               {worker?.name?.[0]?.toUpperCase()}
@@ -180,7 +180,7 @@ export default function DashboardLayout() {
   return (
     <div className="dashboard-bg flex h-screen bg-dark-900 overflow-hidden">
       {/* Desktop Sidebar */}
-      <div className={`hidden lg:flex flex-col bg-dark-800/80 backdrop-blur-xl border-r border-white/10 transition-all duration-300 ${sidebarOpen ? 'w-72' : 'w-20'}`}>
+      <div className={`hidden lg:flex flex-col bg-dark-800/80 backdrop-blur-xl border-r border-brand-500/20 transition-all duration-300 ${sidebarOpen ? 'w-72' : 'w-20'}`}>
         <SidebarContent />
       </div>
 
@@ -188,7 +188,7 @@ export default function DashboardLayout() {
       {mobileSidebar && (
         <>
           <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={() => setMobileSidebar(false)} />
-          <div className="fixed left-0 top-0 bottom-0 w-80 max-w-[88vw] bg-dark-800/95 backdrop-blur-xl border-r border-white/10 z-50 lg:hidden">
+          <div className="fixed left-0 top-0 bottom-0 w-80 max-w-[88vw] bg-dark-800/95 backdrop-blur-xl border-r border-brand-500/20 z-50 lg:hidden">
             <SidebarContent mobile />
           </div>
         </>
@@ -197,7 +197,7 @@ export default function DashboardLayout() {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="bg-dark-800/65 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 h-16 flex items-center justify-between shrink-0">
+        <header className="bg-dark-800/70 backdrop-blur-xl border-b border-brand-500/20 px-4 sm:px-6 h-16 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <button onClick={() => setMobileSidebar(!mobileSidebar)} className="lg:hidden btn-ghost p-2"><FiMenu className="text-lg" /></button>
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="hidden lg:flex btn-ghost p-2 text-lg">
@@ -209,7 +209,7 @@ export default function DashboardLayout() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="hidden lg:block text-xs text-gray-400">{new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+            <span className="hidden lg:block text-xs text-gray-300 bg-brand-500/10 border border-brand-500/25 rounded-full px-3 py-1">{new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
             {worker?.activePolicyId ? (
               <span className="badge-green text-xs hidden sm:flex"><FiCheckCircle className="text-xs" /> Protected</span>
             ) : (

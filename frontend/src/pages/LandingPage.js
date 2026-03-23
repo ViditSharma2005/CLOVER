@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiBarChart2, FiCloudRain, FiCpu, FiDollarSign, FiMenu, FiShield, FiX, FiZap } from 'react-icons/fi';
+import { FiActivity, FiBarChart2, FiCloudRain, FiCpu, FiDollarSign, FiMapPin, FiMenu, FiShield, FiX, FiZap } from 'react-icons/fi';
 
 const STATS = [
-  { label: 'Gig Workers Protected', value: '2.4L+' },
-  { label: 'Claims Paid Out', value: '₹4.8Cr+' },
-  { label: 'Avg Payout Time', value: '< 2hrs' },
-  { label: 'Cities Covered', value: '28+' },
+  { label: 'Delivery Partners Protected', value: '2.4L+' },
+  { label: 'Income Loss Paid', value: '₹4.8Cr+' },
+  { label: 'Avg Payout Time', value: '< 2 hrs' },
+  { label: 'Operational Cities', value: '28+' },
 ];
 
 const FEATURES = [
-  { Icon: FiCpu, title: 'AI Risk Assessment', desc: 'Dynamic weekly premiums calculated using ML models trained on 50+ risk factors including weather history, city risk, and work patterns.' },
-  { Icon: FiZap, title: 'Auto-Triggered Claims', desc: 'No paperwork. When our sensors detect extreme heat, flooding, or AQI spikes in your city, claims are triggered automatically.' },
-  { Icon: FiShield, title: 'Fraud Detection', desc: 'Multi-layer AI fraud detection analyzes location, history, and event data to protect the pool from bad actors.' },
-  { Icon: FiDollarSign, title: 'Instant UPI Payouts', desc: 'Approved claims are transferred to your UPI/bank account within 2 hours — often before you finish your next delivery.' },
-  { Icon: FiBarChart2, title: 'Income Analytics', desc: 'Track your earnings protection, risk score trends, and payout history on a beautifully designed dashboard.' },
-  { Icon: FiCloudRain, title: 'Real-time Weather Alerts', desc: 'Get notified before disruptions hit. Know when your city is under a weather alert so you can plan your day.' },
+  { Icon: FiCpu, title: 'AI Risk Pricing', desc: 'Weekly premium auto-adjusted to your city, route profile, and shift exposure so pricing stays fair for active riders.' },
+  { Icon: FiZap, title: 'Auto Claim Trigger', desc: 'When verified weather or disruption thresholds are crossed, claim initiation happens automatically without forms.' },
+  { Icon: FiShield, title: 'Smart Fraud Guard', desc: 'Anomaly checks on time, location, and duplicate behavior help keep payouts fast for genuine delivery partners.' },
+  { Icon: FiDollarSign, title: 'Fast UPI Settlement', desc: 'Approved payouts move to UPI or bank quickly so your weekly cash cycle remains stable.' },
+  { Icon: FiBarChart2, title: 'Earnings Protection Dashboard', desc: 'See payouts, risk movement, and coverage impact in one operational dashboard built for gig workflows.' },
+  { Icon: FiCloudRain, title: 'Live Disruption Signals', desc: 'Track heat, rain, flood and AQI alerts in your service zones before your shifts are impacted.' },
 ];
 
 const PLATFORMS = ['Zomato', 'Swiggy', 'Zepto', 'Blinkit', 'Amazon', 'Flipkart', 'Dunzo'];
 
 const HOW_IT_WORKS = [
-  { step: '01', title: 'Sign Up in 2 Minutes', desc: 'Register with your phone number, select your delivery platform, and complete basic KYC.' },
-  { step: '02', title: 'Get Your Risk Profile', desc: 'Our AI analyzes your city, platform, vehicle, and work pattern to calculate your personalized weekly premium.' },
-  { step: '03', title: 'Choose Your Plan', desc: 'Pick Basic (₹49/wk), Standard (₹89/wk), or Premium (₹139/wk). Pay weekly, cancel anytime.' },
-  { step: '04', title: 'Get Protected & Paid', desc: 'When a disruption is detected, your claim is auto-triggered and money is in your account within 2 hours.' },
+  { step: '01', title: 'Quick Onboarding', desc: 'Register with phone, choose platform and city, and finish payout details in a few taps.' },
+  { step: '02', title: 'Risk Profile Created', desc: 'Your earning pattern, route exposure, and city disruption history create a live weekly risk profile.' },
+  { step: '03', title: 'Weekly Plan Activated', desc: 'Choose a weekly plan aligned to your earnings cycle, with clear trigger coverage and payout limits.' },
+  { step: '04', title: 'Auto Protection In Action', desc: 'When verified disruption events occur, claim and payout flow starts with minimal manual effort.' },
 ];
 
 export default function LandingPage() {
@@ -43,6 +43,52 @@ export default function LandingPage() {
     return () => clearInterval(t);
   }, []);
 
+  const ShowcaseIllustration = () => (
+    <div className="relative w-full max-w-md mx-auto">
+      <div className="absolute -inset-6 rounded-[32px] bg-gradient-to-br from-brand-500/25 via-brand-400/10 to-transparent blur-2xl" />
+      <div className="relative card p-6 border-brand-400/35 overflow-hidden">
+        <div className="absolute top-3 right-3 badge-orange text-[11px]">Live Parametric Engine</div>
+
+        <div className="rounded-2xl bg-dark-800/85 border border-brand-500/30 p-4">
+          <svg viewBox="0 0 360 220" className="w-full h-auto">
+            <defs>
+              <linearGradient id="road" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#ff6b00" />
+                <stop offset="100%" stopColor="#f59e0b" />
+              </linearGradient>
+            </defs>
+
+            <rect x="0" y="0" width="360" height="220" rx="18" fill="#0b1120" />
+            <path d="M20 170 C80 120, 130 170, 180 130 C230 95, 280 130, 340 80" stroke="url(#road)" strokeWidth="6" fill="none" strokeLinecap="round" strokeDasharray="10 8" />
+
+            <circle cx="60" cy="145" r="8" fill="#fb923c" />
+            <circle cx="145" cy="148" r="8" fill="#fb923c" />
+            <circle cx="225" cy="112" r="8" fill="#fb923c" />
+            <circle cx="310" cy="95" r="8" fill="#fb923c" />
+
+            <rect x="37" y="45" width="84" height="34" rx="10" fill="#111827" stroke="#ff6b00" />
+            <text x="79" y="66" textAnchor="middle" fill="#fed7aa" fontSize="10" fontFamily="Manrope">AQI Alert</text>
+            <text x="79" y="78" textAnchor="middle" fill="#fb923c" fontSize="10" fontFamily="Manrope">322 Severe</text>
+
+            <rect x="132" y="24" width="98" height="38" rx="10" fill="#111827" stroke="#ff6b00" />
+            <text x="181" y="45" textAnchor="middle" fill="#fed7aa" fontSize="10" fontFamily="Manrope">Weekly Cover</text>
+            <text x="181" y="58" textAnchor="middle" fill="#fb923c" fontSize="10" fontFamily="Manrope">INR 2800</text>
+
+            <rect x="248" y="136" width="88" height="38" rx="10" fill="#111827" stroke="#ff6b00" />
+            <text x="292" y="157" textAnchor="middle" fill="#fed7aa" fontSize="10" fontFamily="Manrope">Payout ETA</text>
+            <text x="292" y="170" textAnchor="middle" fill="#fb923c" fontSize="10" fontFamily="Manrope">Under 2h</text>
+          </svg>
+        </div>
+
+        <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+          <div className="soft-panel p-2 text-center text-brand-200 inline-flex flex-col items-center gap-1"><FiMapPin /> City Signal</div>
+          <div className="soft-panel p-2 text-center text-brand-200 inline-flex flex-col items-center gap-1"><FiActivity /> AI Risk</div>
+          <div className="soft-panel p-2 text-center text-brand-200 inline-flex flex-col items-center gap-1"><FiShield /> Auto Payout</div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-dark-900 overflow-x-hidden">
       {/* Navbar */}
@@ -53,7 +99,7 @@ export default function LandingPage() {
               <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center text-sm font-bold">C</div>
               <span className="font-display text-xl font-bold text-white">CLOVER</span>
             </a>
-            <span className="hidden lg:inline-flex section-chip py-1 px-2.5 text-[11px]">AI-Driven Parametric Cover</span>
+            <span className="hidden lg:inline-flex section-chip py-1 px-2.5 text-[11px]">Built For Delivery Operations</span>
           </div>
 
           <div className="hidden md:flex items-center gap-6">
@@ -99,20 +145,22 @@ export default function LandingPage() {
         <div className="absolute top-20 right-10 w-72 h-72 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-10 w-96 h-96 bg-brand-600/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-5xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 bg-brand-500/10 border border-brand-500/30 rounded-full px-4 py-2 text-sm text-brand-400 font-medium mb-8">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 items-center relative z-10">
+          <div className="text-center lg:text-left">
+          <div className="inline-flex items-center gap-2 bg-brand-500/12 border border-brand-500/35 rounded-full px-4 py-2 text-sm text-brand-300 font-medium mb-8 hero-halo">
             <span className="w-2 h-2 bg-brand-400 rounded-full animate-pulse" />
-            Now covering {activePlatform !== undefined ? PLATFORMS[activePlatform] : 'Zomato'} delivery partners
+            Live protection for {activePlatform !== undefined ? PLATFORMS[activePlatform] : 'Zomato'} delivery partners
           </div>
 
-          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
-            India's First<br />
-            <span className="gradient-text">AI Insurance</span><br />
-            for Gig Workers
+          <h1 className="font-display hero-title-pop text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white mb-6">
+            <span className="hero-line hero-line-1">India&apos;s First</span>
+            <span className="hero-line hero-line-2 hero-animated-word">AI Income Shield</span>
+            <span className="hero-line hero-line-3">for Delivery Partners</span>
           </h1>
 
-          <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            Extreme heat, floods, pollution — when disruptions stop your deliveries, CLOVER automatically pays you within 2 hours. No claim forms. No waiting.
+          <p className="hero-subtext text-lg sm:text-xl max-w-2xl mx-auto mb-10">
+            Extreme heat, flood alerts, severe pollution and city disruptions can stop shifts instantly.
+            <strong> CLOVER helps recover weekly income</strong> with automated parametric payouts.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -120,11 +168,16 @@ export default function LandingPage() {
               Start from ₹49/week →
             </Link>
             <Link to="/login" className="btn-secondary text-base py-4 px-8 text-center">
-              Sign In to Dashboard
+              Open My Dashboard
             </Link>
           </div>
 
-          <p className="text-gray-600 text-sm mt-4">No paperwork · Cancel anytime · UPI payout</p>
+          <p className="text-gray-600 text-sm mt-4">Weekly pricing · Instant onboarding · UPI-first payout</p>
+          </div>
+
+          <div className="animate-float-soft">
+            <ShowcaseIllustration />
+          </div>
         </div>
 
         {/* Stats row */}
@@ -141,7 +194,7 @@ export default function LandingPage() {
       {/* Platforms */}
       <section className="py-12 border-y border-dark-700 bg-dark-800/40">
         <div className="max-w-5xl mx-auto px-4">
-          <p className="text-center text-gray-500 text-sm mb-6 uppercase tracking-widest font-medium">Coverage for workers on</p>
+          <p className="text-center text-gray-500 text-sm mb-6 uppercase tracking-widest font-medium">Optimized for partners on</p>
           <div className="flex flex-wrap justify-center gap-4">
             {PLATFORMS.map((p, i) => (
               <div key={p} className={`px-5 py-2.5 rounded-xl border font-semibold text-sm transition-all duration-300 ${i === activePlatform ? 'border-brand-500 bg-brand-500/15 text-brand-400' : 'border-dark-600 bg-dark-700 text-gray-400'}`}>
@@ -156,8 +209,8 @@ export default function LandingPage() {
       <section id="features" className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-display text-4xl font-bold text-white mb-4">Built for the realities of gig work</h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">Every feature was designed specifically for delivery partners who work outside in India's unpredictable climate.</p>
+            <h2 className="font-display text-4xl font-bold text-white mb-4 tracking-tight">Designed like top delivery apps</h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">Fast flows, high-contrast actions, and operational clarity inspired by modern delivery partner experiences.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {FEATURES.map((f) => (
@@ -177,7 +230,7 @@ export default function LandingPage() {
       <section id="how-it-works" className="py-24 px-4 bg-dark-800/30">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-display text-4xl font-bold text-white mb-4">How CLOVER Works</h2>
+            <h2 className="font-display text-4xl font-bold text-white mb-4 tracking-tight">How CLOVER Runs</h2>
             <p className="text-gray-400 text-lg">Simple. Fast. Automated.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -201,8 +254,8 @@ export default function LandingPage() {
       <section id="pricing" className="py-24 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-display text-4xl font-bold text-white mb-4">Simple weekly pricing</h2>
-            <p className="text-gray-400">Pay week by week. Just like you earn.</p>
+            <h2 className="font-display text-4xl font-bold text-white mb-4 tracking-tight">Weekly plans for weekly earnings</h2>
+            <p className="text-gray-400">Operationally aligned to how delivery partners actually get paid.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
@@ -232,8 +285,8 @@ export default function LandingPage() {
             <div className="w-16 h-16 rounded-2xl bg-brand-500/15 border border-brand-500/35 text-brand-300 mx-auto mb-4 flex items-center justify-center">
               <FiShield className="text-3xl" />
             </div>
-            <h2 className="font-display text-4xl font-bold text-white mb-4">Don't work unprotected</h2>
-            <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">Every day you work without coverage is a day a single storm can erase your week's income. Join 2.4 lakh+ gig workers who've chosen to protect themselves.</p>
+            <h2 className="font-display text-4xl font-bold text-white mb-4 tracking-tight">Make every disrupted day recoverable</h2>
+            <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">One severe weather event can wipe out a full week of deliveries. Activate coverage that responds with speed and consistency.</p>
             <Link to="/register" className="btn-primary text-base py-4 px-10 inline-block">
               Get Protected — Starting ₹49/week
             </Link>

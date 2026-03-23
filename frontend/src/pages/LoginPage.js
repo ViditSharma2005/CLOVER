@@ -42,13 +42,13 @@ export default function LoginPage() {
       <div className="w-full max-w-5xl grid lg:grid-cols-2 gap-8 relative z-10">
         <div className="hidden lg:flex card flex-col justify-between">
           <div>
-            <span className="section-chip mb-4">Trusted by gig workers</span>
-            <h2 className="font-display text-4xl font-bold leading-tight">Protection for uncertain working days.</h2>
-            <p className="text-gray-300 mt-4">When weather or city disruptions hit your route, CLOVER helps recover your income fast.</p>
+            <span className="section-chip mb-4">Trusted by delivery partners</span>
+            <h2 className="font-display text-4xl font-bold leading-tight tracking-tight">Protection for high-risk shifts and uncertain days.</h2>
+            <p className="text-gray-300 mt-4">When weather or city disruptions hit your route, CLOVER helps recover your weekly income faster.</p>
           </div>
           <div className="grid grid-cols-3 gap-3">
             {[['2.4L+', 'Workers Covered'], ['<2 hrs', 'Avg Payout'], ['28+', 'Cities']].map(([v, l]) => (
-              <div key={l} className="bg-white/[0.04] border border-white/10 rounded-xl p-3">
+              <div key={l} className="soft-panel p-3 text-center">
                 <p className="font-display text-xl font-bold text-brand-300">{v}</p>
                 <p className="text-xs text-gray-400">{l}</p>
               </div>
@@ -59,11 +59,11 @@ export default function LoginPage() {
         <div className="w-full max-w-md lg:max-w-none mx-auto">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center font-bold text-lg">C</div>
+            <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center font-bold text-lg shadow-glow">C</div>
             <span className="font-display text-2xl font-bold text-white">CLOVER</span>
           </Link>
           <h1 className="font-display text-3xl font-bold text-white">Welcome back</h1>
-          <p className="text-gray-400 mt-2">Sign in to your account</p>
+          <p className="text-gray-300 mt-2 font-medium">Sign in and continue with your protected earnings dashboard</p>
         </div>
 
         <div className="card">
@@ -103,7 +103,7 @@ export default function LoginPage() {
           </div>
 
           {/* Demo credentials */}
-          <div className="mt-4 p-3 bg-dark-700 rounded-xl border border-dark-500">
+          <div className="mt-4 p-3 soft-glow-panel rounded-xl">
             <p className="text-xs text-gray-400 font-medium mb-2">Demo Credentials:</p>
             <div className="space-y-1 text-xs font-mono">
               <p className="text-gray-300">Worker: <span className="text-brand-400">9876543210</span> / <span className="text-brand-400">Worker@123</span></p>

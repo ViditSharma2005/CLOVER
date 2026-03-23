@@ -54,19 +54,11 @@ export default function AnalyticsPage() {
     load();
   }, [period]);
 
-  // Build mock chart data if earnings is empty
-  const earningsChartData = earnings.length > 0 ? earnings.map(e => ({
+  const earningsChartData = earnings.map(e => ({
     name: `W${e._id.week}`,
     protected: e.totalProtected,
     claims: e.claimsCount
-  })) : [
-    { name: 'Week 1', protected: 1200, claims: 1 },
-    { name: 'Week 2', protected: 0, claims: 0 },
-    { name: 'Week 3', protected: 2800, claims: 2 },
-    { name: 'Week 4', protected: 1500, claims: 1 },
-    { name: 'Week 5', protected: 0, claims: 0 },
-    { name: 'Week 6', protected: 3200, claims: 3 },
-  ];
+  }));
 
   const claimStats = dashboard?.claimStats || {};
   const pieData = Object.entries(claimStats).map(([status, data]) => ({
@@ -120,6 +112,11 @@ export default function AnalyticsPage() {
             <option value={6}>6 Months</option>
           </select>
         </div>
+        {earningsChartData.length === 0 ? (
+          <div className="text-center py-10 text-gray-500 text-sm">
+            No protection payouts in this period yet.
+          </div>
+        ) : (
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={earningsChartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#2d2d45" />
@@ -129,6 +126,7 @@ export default function AnalyticsPage() {
             <Bar dataKey="protected" name="Amount Protected (₹)" fill="#1d8fff" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
+        )}
         <p className="text-xs text-gray-500 mt-3">Tip: Use this chart to monitor disruption-heavy weeks and plan buffer savings accordingly.</p>
       </div>
 

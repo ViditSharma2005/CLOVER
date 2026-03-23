@@ -12,6 +12,24 @@ exports.submitClaim = async (req, res) => {
     const { triggerType, disruptionStartDate, disruptionEndDate, description, location, claimAmount } = req.body;
     const worker = req.worker;
 
+    if (!triggerType || !disruptionStartDate) {
+      return res.status(400).json({ success: false, message: 'Trigger type and disruption start date are required.' });
+    }
+
+    const disruptionStart = new Date(disruptionStartDate);
+    if (Number.isNaN(disruptionStart.getTime())) {
+      return res.status(400).json({ success: false, message: 'Invalid disruption start date.' });
+    }
+
+    const disruptionEnd = disruptionEndDate ? new Date(disruptionEndDate) : null;
+    if (disruptionEndDate && Number.isNaN(disruptionEnd?.getTime())) {
+      return res.status(400).json({ success: false, message: 'Invalid disruption end date.' });
+    }
+
+    if (disruptionEnd && disruptionEnd < disruptionStart) {
+      return res.status(400).json({ success: false, message: 'Disruption end date cannot be before start date.' });
+    }
+
     // Get active policy
     const policy = await Policy.findOne({ workerId: worker._id, status: 'active' });
     if (!policy) return res.status(400).json({ success: false, message: 'No active policy found. Please purchase a policy first.' });
@@ -20,17 +38,51 @@ exports.submitClaim = async (req, res) => {
     const coversTrigger = policy.coverageTriggers?.some(ct => ct.type === triggerType);
     if (!coversTrigger) return res.status(400).json({ success: false, message: `Trigger type '${triggerType}' is not covered by your current plan.` });
 
-    // Find relevant weather event
+    // Duplicate prevention in a short claim window.
+    const duplicateClaim = await Claim.findOne({
+      workerId: worker._id,
+      triggerType,
+      disruptionStartDate: {
+        $gte: new Date(disruptionStart.getTime() - 24 * 60 * 60 * 1000),
+        $lte: new Date(disruptionStart.getTime() + 24 * 60 * 60 * 1000)
+      },
+      status: { $nin: ['rejected', 'fraud_flagged'] }
+    });
+    if (duplicateClaim) {
+      return res.status(409).json({
+        success: false,
+        message: 'A similar claim is already present for this disruption period.',
+        claimNumber: duplicateClaim.claimNumber
+      });
+    }
+
+    // Find relevant verified event around the claimed start window.
     const weatherEvent = await WeatherEvent.findOne({
       city: new RegExp(worker.city, 'i'),
       eventType: triggerType,
-      startTime: { $gte: new Date(new Date(disruptionStartDate).getTime() - 6 * 60 * 60 * 1000) },
-      isActive: true
+      isTriggerMet: true,
+      startTime: {
+        $gte: new Date(disruptionStart.getTime() - 24 * 60 * 60 * 1000),
+        $lte: new Date(disruptionStart.getTime() + 24 * 60 * 60 * 1000)
+      }
     }).sort({ startTime: -1 });
+
+    const parametricTriggers = ['extreme_heat', 'heavy_rain', 'flood', 'severe_pollution', 'cyclone', 'dense_fog', 'cold_wave'];
+    if (parametricTriggers.includes(triggerType) && !weatherEvent) {
+      return res.status(422).json({
+        success: false,
+        message: 'No verified parametric event found for this city and date window. Please select the correct date or wait for event sync.'
+      });
+    }
 
     const coverageTrigger = policy.coverageTriggers.find(ct => ct.type === triggerType);
     const maxPayout = Math.round(policy.coverageAmount * (coverageTrigger?.maxPayoutPercent || 70) / 100);
-    const finalClaimAmount = Math.min(claimAmount || maxPayout, maxPayout);
+    const requestedAmount = claimAmount ? Number(claimAmount) : maxPayout;
+    if (!Number.isFinite(requestedAmount) || requestedAmount <= 0) {
+      return res.status(400).json({ success: false, message: 'Claim amount must be a valid positive number.' });
+    }
+
+    const finalClaimAmount = Math.round(Math.min(requestedAmount, maxPayout));
 
     const claim = await Claim.create({
       workerId: worker._id,
@@ -45,8 +97,8 @@ exports.submitClaim = async (req, res) => {
         aqiIndex: weatherEvent.data.aqiIndex,
         sourceApi: weatherEvent.source
       } : {},
-      disruptionStartDate: new Date(disruptionStartDate),
-      disruptionEndDate: disruptionEndDate ? new Date(disruptionEndDate) : null,
+      disruptionStartDate: disruptionStart,
+      disruptionEndDate: disruptionEnd,
       estimatedLoss: finalClaimAmount * 1.2,
       claimAmount: finalClaimAmount,
       location: {
